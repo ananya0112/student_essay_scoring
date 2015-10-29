@@ -1,5 +1,5 @@
 # !/usr/local/bin/python
-import itertools, glob, os, sys, numpy
+import itertools, glob, os, sys, numpy, time
 from genCS_stats import *
 """For each segment, extract scu's associated with their n-grams, generate it's permutations, & select that scu - list with the highest score"""
 
@@ -144,12 +144,13 @@ def gen_cos_sim_str(max_scus, new_d):
 def score_sentences(doc_id, peer_id, path = ""):
 	if path == "":
 		path = "Sentences/Unique_Sets_new/"+str(doc_id)+"/"+str(peer_id)
-	for filename in glob.glob(os.path.join(path, '10.dat')):
+	for filename in glob.glob(os.path.join(path, '*.dat')):
 		sen_id = filename[len(path)+1:filename.find('.dat')]
 		rfile_path = path + "/" + str(sen_id) + ".dat"
-		wfile_path = path + "/" + str(sen_id) + ".best.scu.wtd.new2610" 
+		wfile_path = path + "/" + str(sen_id) + ".best.scu.wtd.new" 
 		bestscu_file = open(wfile_path, 'w')
 		print "Starting sentence : "+ str(sen_id)
+		print "Writing into : ", wfile_path
 		with open(rfile_path) as segments_file:
 			for unique_set_i in segments_file:
 				seg_sentence = unique_set_i.split('\t')
@@ -163,38 +164,65 @@ def score_sentences(doc_id, peer_id, path = ""):
 				scu_len = [max_cosine_sim[scu_id][1][0] for scu_id in max_cosine_sim]
 				avg_ng_len = get_mean(scu_len)
 				wtd_score = max_scu_score * avg_ng_len # ** #
-				#print "----------->>>>", max_scus, max_scu_score, max_cosine_sim, avg_ng_len, wtd_score
 				cos_sim_str = gen_cos_sim_str(max_scus, max_cosine_sim) 
 				bestscu_file.write(uq_id + "\t|\t"+ ", \t".join(map(str, (max_scus))) + "\t|\t"+ str(wtd_score)+ "\t|\t"+ str(max_scu_score) +"\t|\t"+ cos_sim_str +'\n')
 		print "Completed sentence : "+str(sen_id)
 
 
-def main(doc_id, peer_id, ng_parameter, scu_file = ""):
+def main(doc_id, peer_id, ng_parameter, scu_file, output_path = ""):
 	# Step 1 # Function call | ** -- PYRAMID ID as input -- **
 	# scu_dict = getSCU("12_10_09_MATTER.pyr", "/Users/ananyapoddar/Desktop/ResearchProject, Spring 2015/TestCode/scu_YINGHUI/scu")
+	st1 = time.time()
 	scu_dict = getSCU(doc_id, scu_file)
+	print "Time for scu-generation", time.time() - st1
 	# Step 2 : Extract ng_dict for that (doc_id, peer_id) from genCS.py | ** -- PYRAMID ID, PEER_ID, Mean/Median/Mode parameter as input -- ** 
 	# ng_dict = gen_cos_sim("12_10_09_MATTER.pyr", 1, 1)  # Example call!
+	st2 = time.time()
 	ng_dict = gen_cos_sim(doc_id, peer_id, ng_parameter)
-	score_sentences(doc_id, peer_id)
+	print "Time for ng-generation", time.time() - st2
+	st3 = time.time()
+	score_sentences(doc_id, peer_id, output_path)
+	print "Time for scoring only", time.time() - st3
+	print "Total time : ", time.time() - st1
 
 
 
-# def usage():
-# 	print """ Error in usage. \n This script is used to generate the:
-# 	(1)sen_file for segment generation (2)corrected summary.st (3)text.tok files for n-gram file generation. \n
-# 	Correct usage : 'script-name.py text.tok summary.st action-number output-filename' """
+def usage():
+	print """ Error in usage. \n This script is used to score segments:
+	(1)pyrid (2)peer-id (integer value) (3)scu-file - the whole path (4)ng-parameter for min/median/mode \n
+	Correct usage : 'python score_scu_segment_stats.py pyrid peer_id path-to-scu-file ng-parameter<int>' """
 
 
 
 if __name__ == '__main__':
-	# doc_id = sys.argv[1]
-	# peer_id = int(sys.argv[2])
-	# scu_file = sys.argv[3]
-	# ng_parameter = int(sys.argv[4])
-	doc_id, peer_id = "12_10_09_MATTER.pyr", 1
-	scu_file = "/Users/ananyapoddar/Desktop/ResearchProject, Spring 2015/TestCode/scu_YINGHUI/scu"
-	ng_parameter = 1
-	main(doc_id, peer_id, ng_parameter, scu_file)
+	if len(sys.argv) == 5 or len(sys.argv) == 6:
+		doc_id = sys.argv[1]
+		peer_id = int(sys.argv[2])
+		scu_file = sys.argv[3]
+		ng_parameter = int(sys.argv[4])
+		output_path = ""
+		if len(sys.argv) == 6:
+			output_path = sys.argv[5]
+		main(doc_id, peer_id, ng_parameter, scu_file, output_path)
+		# doc_id, peer_id = "12_10_09_MATTER.pyr", 1
+		# scu_file = "/Users/ananyapoddar/Desktop/ResearchProject, Spring 2015/TestCode/scu_YINGHUI/scu"
+		# ng_parameter = 1
+		# output_path = "Sentences/Unique_Sets_new/"+str(doc_id)+"/"+str(peer_id)
+	else:
+		usage()
+		sys.exit(-1)
+	
+
+"""
+Example call:
+python score_scu_segment_stats.py		<pyr_id>	<peer_id>	<path to SCU File> 						<ng_parameter 0/1/2>
+python score_scu_segment_stats.py '12_10_09_MATTER.pyr' '4' '/Users/ananyapoddar/Desktop/ResearchProject, Spring 2015/TestCode/scu_YINGHUI/scu' '1'
+
+Sentences/Unique_Sets_new/12_10_09_MATTER.pyr/1
+"""
 
 
+"""
+Debugging statements:
+#print "----------->>>>", max_scus, max_scu_score, max_cosine_sim, avg_ng_len, wtd_score
+"""

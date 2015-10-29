@@ -5,23 +5,15 @@ unique_set_id '|', {scu_set} '|',new wtd score ,'|', avg wtd score,'|', ng_len, 
 16	|	103	|	13.0823210974	|	2.61646421949	|	5	| 	0.654116054871	 | 	0.0	 | 	0.654116054871
 """
 
-import os, glob
+import os.path
 import sys
 import dln
 
 """ Set these parameters """ 
 best_scu_path = 'Sentences/Unique_Sets_new/12_10_09_MATTER.pyr/1/new_wtd_files/'
-# no_sen = 13 # Actual no. of sentences
+no_sen = 10 # Actual no. of sentences
 top_scu_dict = dict() # <sen_id : {[], []} set of scu's>
 # n = 3
-from itertools import islice
-
-
-def get_valid_senid(senid):
-	"""For a string extracted from the os.path such as '/123./ will output '123' """
-	ldigits = [e for e in senid if e.isdigit()]
-	return ''.join(ldigits)
-
 
 def extract_scu_set(file_line):
 	""" Takes the sentence format specified above, extracts scu's and returns a list """
@@ -39,26 +31,33 @@ def extract_top_n_scus(file_pth, n):
 	counter = 0
 	top_scu_list = []
 	with open(file_pth) as sen_scu_file:
-		head = list(islice(sen_scu_file, n))
+		# no_lines_file = sen_scu_file.readlines()
+		# limit = n if n < len(no_lines_file) else len(no_lines_file)
+		# print limit
+		head = [next(sen_scu_file) for x in xrange(n)]
+	# top_scu_list = [extract_scu_set(line) for line in head]
 	for line in head:
 		if len(extract_scu_set(line)) > 0:
 			top_scu_list.append(extract_scu_set(line))
 	return top_scu_list
 
+# get top scu's for each sentence
+# sen_id convert into matrix format
+# Call dln.py as with input as X and Y
+
 
 def get_best_scus(n, peer_id):
 	""" Set no_sen (global parameter) on top """
 	best_scu_path = 'Sentences/Unique_Sets_new/12_10_09_MATTER.pyr/'+str(peer_id)+'/new_wtd_files/'
-	top_scu_dict = dict() # <sen_id : {[], []} set of scu's>
-	for file_path in glob.glob(os.path.join(best_scu_path, '*.best.scu.wtd.new.st.unique')):
-		sen_no = file_path[len(best_scu_path):file_path.find('.best.scu.wtd.new')]
-		sen_id = get_valid_senid(sen_no)
+	for sen_id in xrange(10, no_sen+1):
+		file_path = best_scu_path + str(sen_id) + '.best.scu.wtd.new.st.unique'
 		# print 'fp', file_path
 		if not (os.path.exists(file_path)):
 			continue
 		else:
 			top_scu_dict[sen_id] = extract_top_n_scus(file_path, n)
-	print '----Best SCUs for Peer ID : '+str(peer_id)+'----'
+			print sen_id, top_scu_dict[sen_id]
+	print '----Best SCUs for '+str(peer_id)+'----'
 	for k,v in top_scu_dict.iteritems():
 		print k, v
 	print '----------------'
@@ -163,9 +162,4 @@ if __name__ == "__main__":
 from get_top_scus import *
 a = generate_inputs(3)
 """
-
-# Steps:
-# get top scu's for each sentence
-# sen_id convert into matrix format
-# Call dln.py as with input as X and Y
 	

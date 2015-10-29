@@ -4,8 +4,8 @@ from get_top_scus import get_best_scus, flatten_lists
 
 n = 3
 # Histogram: How many scus occur once per sentence, twice per sentence, etc.
-# Average size of all the sets in a sentence | done
-# Average number of sets per sentence | done
+# Average size of all the sets in a sentence 
+# Average number of sets per sentence 
 # Average weight of SCUs that occur once per sentence, twice per sentence, etc.
 # Histogram: How many SCUs occur in n sentences, for n=1 to number of sentences? 
 # Average weight of SCUs that occur in n sentences?
@@ -36,8 +36,16 @@ def getSCU(pyr_name, scu_doc_path):
 # Step 1 # Function call | ** -- PYRAMID ID as input -- **
 scu_dict = getSCU("12_10_09_MATTER.pyr", "/Users/ananyapoddar/Desktop/ResearchProject, Spring 2015/TestCode/scu_YINGHUI/scu")
 
+best_scus = {}
+n = 3
+for peer_id in xrange(1,20):
+	adder = len(best_scus)
+	temp_scus = get_best_scus(int(n), peer_id)
+	for k,v in temp_scus.iteritems():
+		best_scus[int(k)+adder] = v
+for k,v in best_scus.iteritems():
+	print k,v
 
-best_scus = get_best_scus(int(n))
 
 """
 Output : The sentences considered are 7 sentences from 1-9:
@@ -64,9 +72,9 @@ def get_avg_size_sets():
 			total_sets_size = total_sets_size + len(scu_set)
 	return float(total_sets_size)/float(no_of_sets)
 
-print 'Avg size:'
-avg_size = get_avg_size_sets()
-print avg_size
+# print 'Avg size of sets:'
+# avg_size = get_avg_size_sets()
+# print avg_size
 
 # 3. Average number of sets per sentence
 
@@ -80,9 +88,9 @@ def get_avg_no_sets():
 	# print no_of_sets, no_of_sen
 	return float(no_of_sets)/float(no_of_sen)
 
-print 'Avg no:'
-avg_no = get_avg_no_sets()
-print avg_no
+# print 'Avg no of sets per sen_id:'
+# avg_no = get_avg_no_sets()
+# print avg_no
 
 """
 Output : The sentences considered are 7 sentences from 1-9:
@@ -136,7 +144,7 @@ def get_freq_intra_scus():
 				freq_table[sen_id][freq][1] = freq_table[sen_id][freq][1] + scu_dict[scu]
 	return freq_table
 
-
+# print "How many scus occur once per sentence, twice per sentence, etc."
 # f = get_freq_intra_scus()
 # for k,v in f.iteritems():
 # 	print k,v
@@ -157,7 +165,7 @@ sen_id | freq | count | total-weight
 def get_avg_wt_intra_scus():
 	""" total-wt scu's - that occur x times / no. of scu's that occur x times |
 	<freq-intra-scu-occurence : [count, total-wt]>"""
-	avg_wt_intra_scus = {1: [0, 0, 0], 2: [0, 0, 0], 3: [0, 0, 0]}
+	avg_wt_intra_scus = {1: [0, 0, 0], 2: [0, 0, 0], 3: [0, 0, 0]} # 'n' no. will be max frequency
 	f_table = get_freq_intra_scus()
 	for sen_id,v in f_table.iteritems(): # Sentences
 		for freq, cw in v.iteritems(): # <freq : [count, weight]>
@@ -166,11 +174,31 @@ def get_avg_wt_intra_scus():
 			avg_wt_intra_scus[freq][2] = float(avg_wt_intra_scus[freq][1])/float(avg_wt_intra_scus[freq][0])
 	return avg_wt_intra_scus
 
-print 'intra-scus |\n freq-x, count, weight, wt-avg'
-for k,v in get_avg_wt_intra_scus().iteritems():
-	print k, v
+# print 'intra-scus |\n freq-x, count, weight, wt-avg'
+# for k,v in get_avg_wt_intra_scus().iteritems():
+# 	print k, v
 
+"""
+Output : The sentences considered are 7 sentences from 1-9:
+----Best SCUs----
+1 [[103], [100]]
+2 [[105], [110], [100, 110]]
+3 [[105], [100, 105], [121, 105]]
+4 [[138], [137]]
+7 [[136], [136, 119], [119]]
+8 [[100], [100, 136], [100, 119]]
+9 [[100], [136, 100]]
 
+Flattened lists : 
+1 [103, 100]
+2 [105, 110, 100, 110]
+3 [105, 100, 105, 121, 105]
+4 [138, 137]
+7 [136, 136, 119, 119]
+8 [100, 100, 136, 100, 119]
+9 [100, 136, 100]
+----------------
+"""
 def get_freq_inter_scus():
 	"""Create a dictionary of  <frequency_x : [count, total_wt]>"""
 	freq_table = {}
@@ -191,8 +219,12 @@ def get_freq_inter_scus():
 
 print 'inter-scus |\n freq-x, count, weight, wt-avg'
 f_table = get_freq_inter_scus()
-for k,v in f_table.iteritems():
-	print k,v
+# for k,v in f_table.iteritems():
+# 	print k,v
+
+keys_ordered = sorted(f_table.keys())
+for k in keys_ordered:
+	print k, f_table[k]
 
 """
 Output of get_freq_inter_scus():

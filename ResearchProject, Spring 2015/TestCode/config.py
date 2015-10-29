@@ -17,7 +17,11 @@ orig_summary_st = os.path.join(peer_path, 'summary.st')
 orig_text_tok = os.path.join(peer_path, 'text.tok')
 
 # SCU files:
-scu_path = "scu_YINGHUI/scu"
+scu_path = "scu_YINGHUI"
 
 # Path to Weiwei's code directory
 wcode_path = peer_path # temporarily | modify this!
+
+# Path to OUTPUT : Sentences file
+# "Sentences/Unique_Sets_new/"+str(doc_id)+"/"+str(peer_id)
+sentences_path = os.path.join('Sentences', 'Unique_Sets_new')

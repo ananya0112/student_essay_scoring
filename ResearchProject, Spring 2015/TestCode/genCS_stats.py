@@ -19,7 +19,8 @@ import numpy
 import math
 
 ng_limit = 12
-cosine_sim_th = 0.60 # Threshold value #
+lng_limit = 3
+cosine_sim_th = 0.55 # Threshold value #
 
 ng_dict = {}
 stats_dict = {}
@@ -57,6 +58,7 @@ def gen_cos_sim(documid, peerid, mode):
 	list of best scu's & their cosine similarities| For a specific pyramid & *PEER*
 	mode = 0 minimum, mode = 1 median, mode = 2 maximum | Default mode is 2 i.e max"""
 
+	started_peer = False
 	global stats_dict
 	ngramf, ngram_lsf, scuf, scu_lsf = "peer_YINGHUI/ngram.ap.new", "peer_YINGHUI/ngram.ap.new.text.ls", "scu_YINGHUI/scu", "scu_YINGHUI/text.tok.ls"
 	print "Starting ngram generation"
@@ -69,7 +71,7 @@ def gen_cos_sim(documid, peerid, mode):
 			doc_id, peer_id, sen_id, start_pos, end_pos, ngram_text = ngram_line[0], int(ngram_line[1]), int(ngram_line[2]), int(ngram_line[3]), int(ngram_line[4]), ngram_line[5]
 			if(doc_id == documid and peer_id == peerid): # Only for that doc, peer#
 				started_peer = True 
-				if ((end_pos - start_pos + 1) <= ng_limit): # If len(ngram) <= 12, only then it should be considered #
+				if (((end_pos - start_pos + 1) <= ng_limit) and (((end_pos - start_pos + 1) >= lng_limit))): # If len(ngram) <= 12, only then it should be considered #
 					ng_ls_arr = get_float_array(ng_ls.strip())
 
 					if ((len(ng_ls_arr) == 0 ) or (if_zero(ng_ls_arr))):

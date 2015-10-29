@@ -22,20 +22,20 @@ from time import gmtime, strftime
 #
 
 # Toy data
-X = {1,2,3,4,5}
+# X = {1,2,3,4,5}
 
-Y = {
-'A' : [1, 5],
-'B' : [2, 4],
-'C' : [2, 3],
-'D' : [3],
-'E' : [1, 4, 5]
-}
+# Y = {
+# 'A' : [1, 5],
+# 'B' : [2, 4],
+# 'C' : [2, 3],
+# 'D' : [3],
+# 'E' : [1, 4, 5]
+# }
 
-X = {j: set() for j in X}
-for i in Y:
-    for j in Y[i]:
-        X[j].add(i)
+# X = {j: set() for j in X}
+# for i in Y:
+#     for j in Y[i]:
+#         X[j].add(i)
 
  # - See more at: http://www.ams.org/samplings/feature-column/fcarc-kanoodle#sthash.9shmNcVB.dpuf
 
@@ -120,7 +120,7 @@ def deselect(X, Y, r, cols):
                     X[k].add(i)
 
 
-a = solve(X, Y)
+# a = solve(X, Y)
 # print "Performing dancing links operation at time : " + strftime("%Y-%m-%d %H:%M:%S")
-for i in a:
-    print(i)
+# for i in a:
+#     print(i)

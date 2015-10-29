@@ -14,7 +14,10 @@ import config
 # 	for line in fp:
 # 		print line
 """
-Set parameters: Pyrid
+Set parameters: Pyrid, peer_id (loop), ng_parameter
+lower_ng_limit, upper_ng_limit | to be used in genSegments.py | default = 2,12
+
+should we add a 'threshold' for the ng_dict in genCS_stats.py=>score_scu_Segments_stats.py from here
 """
 pyr_id = '12_10_09_MATTER.pyr'
 
@@ -66,7 +69,7 @@ This is used as an input to generate unique sets for each sentence using genSegm
 
 Note: sentence_file.st contains sentences from 'ALL PYRAMIDS + ALL PEERS'. Hence 'sentence_file_peerid.py' is essetial to prune the sentence set.
 """
-# python senfilegeneration.py text.tok summary.st 1 sentence_file.st
+# # Eg: python senfilegeneration.py text.tok summary.st 1 sentence_file.st
 sen_file = os.path.join(config.peer_path, "sentence_file.1022644.st")
 # print "calling sentence file generation.. "
 # cmd1 = 'python senfilegeneration.py "'+ config.orig_text_tok +'" "' + config.orig_summary_st +'" 1 "'+ sen_file +'"'
@@ -75,6 +78,7 @@ sen_file = os.path.join(config.peer_path, "sentence_file.1022644.st")
 # print "Done!"
 
 """
+* START FROM HERE FOR LOOPING OVER PEERS * 
 File 'sentence_file' => sen_file is a nicely formatted doc; 
 This is given to sentence_file_peerid.py to extract sorted sentences by sen_id. This outputs to a file 'peer_file.st' which now contains
 all the formatted summary sentences (text only) for that peer;
@@ -82,46 +86,73 @@ all the formatted summary sentences (text only) for that peer;
 
 Now important thing to rembr is : this returns all the sentences for a given 'pyramid id, peer id'
 """
-peer_file = os.path.join(config.peer_path, "peer_file1.st")
-# import sentence_file_peerid as peer_sen
-# peer_id = 1
-print 'pf', peer_file
-# peer_sen.get_sentences(sen_file, pyr_id, peer_id, peer_file)
 
-"""
-Next, call genSegments.py with peer_file only; nothing else is required
-File 'sentence_file' => sen_file is a nicely formatted doc; => peer_file.st to get sentences by peer (ABV)=> 
-* Given as Input to 'genSegments.py'*. This returns/outputs the 'Unique sets/segmentations'
+# peer_id = 2
+""" ***** """
 
-* These are the modified segmentations *
-"""
-print 'generating segments stored as sen-id.dat within UniqueSets/pyrid/peer-id/[sen-id]'
-cmd5 = "python genSegments.py '"+peer_file+"'"
-print cmd5
-os.system(cmd5)
+for peer_id in xrange(1, 21):
+	peer_file = os.path.join(config.peer_path, "peer_file"+str(peer_id)+"_new.st")
+	import sentence_file_peerid as peer_sen
 
-"""
-Now that we have the unique sets, score them.
-genCS_stats.py | score_scu_segments_stats.py
+	peer_sen.get_sentences(sen_file, pyr_id, peer_id, peer_file)
 
-Format of filtered document
-['100', '|', '0.196697618504', '|', '5', '|', '3', '| ', '0.786790474017', ' | ', '0.0', ' | ', '0.786790474017']
-  scu_id, '|',new wtd score ,'|', scu_score,'|', ng_len, '| ', cos_sim_mean, ' | ', sd, ' | ', cos_sim
-  lines_seen is used to maintain unique files
-"""
+	"""
+	Next, call genSegments.py with peer_file only; nothing else is required
+	File 'sentence_file' => sen_file is a nicely formatted doc; => peer_file.st to get sentences by peer (ABV)=> 
+	* Given as Input to 'genSegments.py'*. This returns/outputs the 'Unique sets/segmentations'
+
+	* These are the modified segmentations *
+	python genSegments.py 'peer_file.st' 2 11
+	OR:
+	python genSegments.py '[..some_path]/peer_file.st' 2 11 'Sentences/Unique_Sets_new/12_10_09_MATTER.pyr/1'[<-output_path:]
+	"""
+	sen_output_path = str(pyr_id)+"/"+str(peer_id)
+	out_segments_file = output_score_file = os.path.join(config.sentences_path, sen_output_path)
+	lower_ng_limit, upper_ng_limit = 2, 11
+	print 'generating segments stored as sen-id.dat within UniqueSets/pyrid/peer-id/[sen-id]'
+	cmd5 = "python genSegments.py '"+peer_file+"' "+str(lower_ng_limit)+" "+str(upper_ng_limit)+" '"+out_segments_file+"'"
+	print cmd5
+	os.system(cmd5)
+
+	"""
+	Once I have my Unique sets:
+	score_scu_segments_stats.py and genCS.py take inputs as 'pyrid, peerid'. *
+
+	Now that we have the unique sets, score them.
+	genCS_stats.py | score_scu_segments_stats.py
+	<Organise this better?>
+
+	Format of filtered document
+	['100', '|', '0.196697618504', '|', '5', '|', '3', '| ', '0.786790474017', ' | ', '0.0', ' | ', '0.786790474017']
+	  scu_id, '|',new wtd score ,'|', scu_score,'|', ng_len, '| ', cos_sim_mean, ' | ', sd, ' | ', cos_sim
+	  lines_seen is used to maintain unique files
+	"""
+
+	# #Full path : "Sentences/Unique_Sets_new/"+str(doc_id)+"/"+str(peer_id) | Path for input + output file | put this path for gen_segments as well for output path
+	# #done above:sen_output_path = str(pyr_id)+"/"+str(peer_id)
+	# #done above:output_score_file = os.path.join(config.sentences_path, sen_output_path)
+	scu_file = os.path.join(config.scu_path, 'scu')
+	ng_parameter = 1
+	print 'sf', scu_file
+	print 'scoring segments for peer for each sentence'
+	cmd6 = "python score_scu_segment_stats.py '"+pyr_id+"' "+str(peer_id)+" '"+scu_file+"' "+str(ng_parameter) + " '"+output_score_file+"'"
+	print cmd6
+	os.system(cmd6)
 
 
+	"""
+	10/28, 2.34 am unique sets done + scoring done
+	Run loop over each peer - summary to be computed, for a pyramid set!
 
+	run filter_scu_new_wtd.py | fix the main there, put the paths in config, make it common
+	path_doc = "Sentences/Unique_Sets_new/12_10_09_MATTER.pyr/1/" => output_score_file
+	path_doc_write = "Sentences/Unique_Sets_new/12_10_09_MATTER.pyr/1/new_wtd_files/"
 
-"""
-10/26, 8.40 pm unique sets done.
-
-Once I have my Unique sets:
-score_scu_segments_stats.py and genCS.py take inputs as 'pyrid, peerid'. *
-Run loop over each peer - summary to be computed, for a pyramid set!
-
-organise score_scu_segments_stats.py | organise files after
-
-run filter_scu_new_wtd.py
-"""
-
+	Full path : "Sentences/Unique_Sets_new/"+str(doc_id)+"/"+str(peer_id)
+	"""
+	# #Input : output_score_file || Output: output_filtered_score_path #
+	output_filtered_score_path = os.path.join(output_score_file, 'new_wtd_files')
+	print "Filtering score files.."
+	cmd7 = "python filter_scu_new_wtd.py '"+output_score_file+"' '"+output_filtered_score_path+"'"
+	print cmd7
+	os.system(cmd7)

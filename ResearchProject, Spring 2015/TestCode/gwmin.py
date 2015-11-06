@@ -246,7 +246,7 @@ s = {1 : [103, -1],
 }
 
 
-def main(a_type):
+def main(a_type, gr = {}):
 	global algo_type
 	algo_type = int(a_type) # Setting the algorithm type!
 	# SCU_SETS toy value #
@@ -257,6 +257,7 @@ def main(a_type):
 	# 'D' : [3],
 	# 'E' : [1, 4, 5]
 	# }
+	gr = s
 	g = Graph(s)
 	g.get_info() # Here, returning graph in the initial state # 
 	max_set = g.get_maximal_independent_set()

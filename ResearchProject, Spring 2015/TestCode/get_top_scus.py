@@ -11,7 +11,7 @@ import dln
 
 """ Set these parameters """ 
 best_scu_path = 'Sentences/Unique_Sets_new/12_10_09_MATTER.pyr/1/new_wtd_files/'
-# no_sen = 13 # Actual no. of sentences
+no_sen = 20 # Actual no. of sentences
 top_scu_dict = dict() # <sen_id : {[], []} set of scu's>
 # n = 3
 from itertools import islice

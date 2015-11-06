@@ -34,17 +34,19 @@ def getSCU(pyr_name, scu_doc_path):
 
 
 # Step 1 # Function call | ** -- PYRAMID ID as input -- **
-scu_dict = getSCU("12_10_09_MATTER.pyr", "/Users/ananyapoddar/Desktop/ResearchProject, Spring 2015/TestCode/scu_YINGHUI/scu")
+## For complete analytics of 20 sentences ; simply sentence based ##
+# scu_dict = getSCU("12_10_09_MATTER.pyr", "/Users/ananyapoddar/Desktop/ResearchProject, Spring 2015/TestCode/scu_YINGHUI/scu")
 
-best_scus = {}
-n = 3
-for peer_id in xrange(1,20):
-	adder = len(best_scus)
-	temp_scus = get_best_scus(int(n), peer_id)
-	for k,v in temp_scus.iteritems():
-		best_scus[int(k)+adder] = v
-for k,v in best_scus.iteritems():
-	print k,v
+# best_scus = {}
+# n = 3
+# for peer_id in xrange(1,20):
+# 	adder = len(best_scus)
+# 	temp_scus = get_best_scus(int(n), peer_id)
+# 	for k,v in temp_scus.iteritems():
+# 		best_scus[int(k)+adder] = v
+# for k,v in best_scus.iteritems():
+# 	print k,v
+## == ##
 
 
 """
@@ -217,14 +219,14 @@ def get_freq_inter_scus():
 			freq_table[freq][2] = float(freq_table[freq][1]) / float(freq_table[freq][0])
 	return freq_table
 
-print 'inter-scus |\n freq-x, count, weight, wt-avg'
-f_table = get_freq_inter_scus()
+# print 'inter-scus |\n freq-x, count, weight, wt-avg'
+# f_table = get_freq_inter_scus()
 # for k,v in f_table.iteritems():
 # 	print k,v
 
-keys_ordered = sorted(f_table.keys())
-for k in keys_ordered:
-	print k, f_table[k]
+# keys_ordered = sorted(f_table.keys())
+# for k in keys_ordered:
+# 	print k, f_table[k]
 
 """
 Output of get_freq_inter_scus():
@@ -234,3 +236,20 @@ Output of get_freq_inter_scus():
 5 [1, 5]
 """
 
+
+def generate_all_best_scus():
+	all_scus = {}
+	n = 3
+	for peer_id in xrange(1,21):
+		all_scus[peer_id] = {}
+
+	for peer_id in xrange(1,21):
+		temp_scus = get_best_scus(int(n), peer_id)
+		for k,v in temp_scus.iteritems():
+			all_scus[peer_id][int(k)] = v
+	for k,v in all_scus.iteritems():
+		for ky, val in v.iteritems():
+			for e in val:
+				if len(e)>0:
+					e.append(-1*ky)
+			print k, ky, val

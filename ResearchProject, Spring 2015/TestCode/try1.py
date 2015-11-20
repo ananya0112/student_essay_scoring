@@ -61,8 +61,8 @@ def gen_cos_sim(documid, peerid, mode):
 
 	started_peer = False
 	global stats_dict
-	ngramf, ngram_lsf, scuf, scu_lsf = config.ngramf, config.ngram_lsf, "scu_YINGHUI/scu", "scu_YINGHUI/text.tok.ls"
-	# ngramf, ngram_lsf, scuf, scu_lsf = "peer_YINGHUI/ngram.ap.new", "peer_YINGHUI/ngram.ap.new.text.ls", "scu_YINGHUI/scu", "scu_YINGHUI/text.tok.ls"
+	ngramf, ngram_lsf, scuf, scu_lsf = config.peer_path + "/ngram.ap.new", config.peer_path + "/ngram.ap.new.text.ls", config.scu_path + "/scu", config.scu_path + "/text.tok.ls"
+	print 'paths here:', ngramf
 	print "Starting ngram generation"
 
 	with open(ngram_lsf) as textfile1, open(ngramf) as textfile2: 

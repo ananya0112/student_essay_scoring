@@ -59,30 +59,34 @@ pan_file_path = "pan-files/"
 
 for file_path in glob.glob(os.path.join(pan_file_path, '*.pan')):
 	pan_file_name = file_path[len(pan_file_path):]
-	peer_id = peer_id + 1
-	# print file_path, ' ----> ', pan_file_name
-	cmd = "perl process-pans.pl '"+ file_path + "' > 'pan-files/parsed/op_" + pan_file_name+"'"
-	# print cmd
-	os.system(cmd)
-	parsed_file = "pan-files/parsed/op_" + pan_file_name
-	processed_file = parsed_file+".pr"
+	print pan_file_name
+	## -- ##
+	# peer_id = peer_id + 1
+	# # print file_path, ' ----> ', pan_file_name
+	# cmd = "perl process-pans.pl '"+ file_path + "' > 'pan-files/parsed/op_" + pan_file_name+"'"
+	# # print cmd
+	# os.system(cmd)
+	# parsed_file = "pan-files/parsed/op_" + pan_file_name
+	# processed_file = parsed_file+".pr"
 
-	wfile = open(processed_file, 'w')
-	with open(parsed_file) as rfile:
-		for line in rfile:
-			print "full line: ", line
-			line = line.replace(". ", "\t")
-			pl = parse_line(line, peer_id) # Each line from pan file
-			for each in pl:
-				print 'writing:', each
-				wfile.write(each+'\n')
-	wfile.close()
+	# wfile = open(processed_file, 'w')
+	# with open(parsed_file) as rfile:
+	# 	for line in rfile:
+	# 		print "full line: ", line
+	# 		line = line.replace(". ", "\t")
+	# 		pl = parse_line(line, peer_id) # Each line from pan file
+	# 		for each in pl:
+	# 			print 'writing:', each
+	# 			wfile.write(each+'\n')
+	# wfile.close()
 
-	# Sort file by 1st and 2nd column; Then delete temporary '.pr' file;
-	cmd_sort = "sort -n -t$'\t' -k1,1 -k2,2 '"+ processed_file +"' > '" + processed_file+".st'"
-	print cmd_sort
-	os.system(cmd_sort)
-	# os.remove(processed_file)
+	# # Sort file by 1st and 2nd column; Then delete temporary '.pr' file;
+	# cmd_sort = "sort -n -t$'\t' -k1,1 -k2,2 '"+ processed_file +"' > '" + processed_file+".st'"
+	# print cmd_sort
+	# os.system(cmd_sort)
+	# # os.remove(processed_file)
+
+	## -- ##
 
 
 

@@ -75,12 +75,14 @@ def max_scu_list(seg_ng):
 			cos_list.append(ng_dict[each_ng.strip()][1])
 			nglen_rep = list(itertools.repeat(len(each_ng.strip().split(" ")), len(ng_dict[each_ng.strip()][0])))
 			nglen_list.append(nglen_rep)
+	
 	scus = list(itertools.product(*scus_list))
 	cos_sim = list(itertools.product(*cos_list))
 	ng_len = list(itertools.product(*nglen_list))
 	scu_cs = {}
 	for i in xrange(len(scus)): # {scu_id_combo : [(cos_sim_combo), (ng_len_combo)]} 
 		scu_cs[scus[i]] = [cos_sim[i], ng_len[i]]
+
 	scu_uel = [each_el for each_el in scus if len(set(each_el)) == len(each_el)] # This removes any scu_id combos with repeated scu_id's
 	uq_list = [(scu_uel_i, compute_wtd_score(scu_uel_i, cos_sim[scus.index(scu_uel_i)], ng_len[scus.index(scu_uel_i)])) for scu_uel_i in scu_uel]
 
@@ -90,10 +92,9 @@ def max_scu_list(seg_ng):
 	max_value = max(uq_list, key = (lambda x : x[1]))
 	max_key = max_value[0] # This is a 'set' of unique scu id's
 	# Will look thru scu_cs, look for dictionary keys having same (&only these el)
-
 	new_d = {} # {scu_id_combo : cos_sim_combo, len_ng_combo}
 	for each_key in scu_cs:
-		if ((len(set(each_key)) == len(set(max_key)) == len(set(each_key).intersection(set(max_key)))) and (each_key == max_key)):
+		if ((len(set(each_key)) == len(set(max_key)) == len(set(each_key).intersection(set(max_key))))):
 			for i in xrange(len(each_key)): 
 				if each_key[i] not in new_d:
 					# {scu_id_combo 	: 	cos_sim_combo, len_ng_combo}
@@ -125,6 +126,7 @@ def gen_cos_sim_str(max_scus, new_d):
 	if bool(new_d): # Check if dict empty
 		mean, std = get_stats(new_d)[0], get_stats(new_d)[1]
 	stats_str =  str(mean)+ '\t|\t' + str(std) + '\t|\t'
+
 	cos_str, scu_ngl = "", ""
 	for scu in max_scus:
 		scu_cos_str, scu_ng_len = "", ""
@@ -136,6 +138,7 @@ def gen_cos_sim_str(max_scus, new_d):
 		cos_str += scu_cos_str + '\t'
 		scu_ngl += scu_ng_len + '\t'
 	return scu_ngl + '|\t' + stats_str + cos_str[:-1]
+
 
 
 def score_sentences(doc_id, peer_id, path = ""):
@@ -161,7 +164,7 @@ def score_sentences(doc_id, peer_id, path = ""):
 				scu_len = [max_cosine_sim[scu_id][1][0] for scu_id in max_cosine_sim]
 				avg_ng_len = get_mean(scu_len)
 				wtd_score = max_scu_score * avg_ng_len # ** #
-				cos_sim_str = gen_cos_sim_str(max_scus, max_cosine_sim)
+				cos_sim_str = gen_cos_sim_str(max_scus, max_cosine_sim) 
 				bestscu_file.write(uq_id + "\t|\t"+ ", \t".join(map(str, (max_scus))) + "\t|\t"+ str(wtd_score)+ "\t|\t"+ str(max_scu_score) +"\t|\t"+ cos_sim_str +'\n')
 		print "Completed sentence : "+str(sen_id)
 
@@ -176,6 +179,9 @@ def main(doc_id, peer_id, ng_parameter, scu_file, output_path = ""):
 	# ng_dict = gen_cos_sim("12_10_09_MATTER.pyr", 1, 1)  # Example call!
 	st2 = time.time()
 	ng_dict = gen_cos_sim(doc_id, peer_id, ng_parameter)
+	# for k,v in ng_dict.iteritems():
+	# 	val = k + "|", v
+	# 	print val
 	print "Time for ng-generation", time.time() - st2
 	st3 = time.time()
 	score_sentences(doc_id, peer_id, output_path)
@@ -183,10 +189,12 @@ def main(doc_id, peer_id, ng_parameter, scu_file, output_path = ""):
 	print "Total time : ", time.time() - st1
 
 
+
 def usage():
 	print """ Error in usage. \n This script is used to score segments:
 	(1)pyrid (2)peer-id (integer value) (3)scu-file - the whole path (4)ng-parameter for min/median/mode \n
 	Correct usage : 'python score_scu_segment_stats.py pyrid peer_id path-to-scu-file ng-parameter<int>' """
+
 
 
 if __name__ == '__main__':
@@ -206,8 +214,7 @@ if __name__ == '__main__':
 	else:
 		usage()
 		sys.exit(-1)
-
-
+	
 
 """
 Example call:
@@ -215,8 +222,8 @@ python score_scu_segment_stats.py		<pyr_id>	<peer_id>	<path to SCU File> 						<
 python score_scu_segment_stats.py '12_10_09_MATTER.pyr' '2' '/Users/ananyapoddar/Desktop/ResearchProject, Spring 2015/TestCode/scu_YINGHUI/scu' '1'
 
 Sentences/Unique_Sets_new/12_10_09_MATTER.pyr/1
-python score_scu_segment_stats.py '12_10_09_MATTER.pyr' '8' '/Users/ananyapoddar/Desktop/ResearchProject, Spring 2015/TestCode/scu_YINGHUI/scu' '1'
 """
+
 
 """
 Debugging statements:

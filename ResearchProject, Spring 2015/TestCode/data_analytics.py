@@ -29,7 +29,8 @@ def getSCU(pyr_name, scu_doc_path):
 				scu_dict[scu_id] = scu_score
 		elif ((scu_pyr_name.strip() != pyr_name.strip()) and (started_pyr)):
 			break
-	print scu_dict
+	# print scu_dict
+	print "Done generating scu_dict"
 	return scu_dict
 
 
@@ -236,20 +237,3 @@ Output of get_freq_inter_scus():
 5 [1, 5]
 """
 
-
-def generate_all_best_scus():
-	all_scus = {}
-	n = 3
-	for peer_id in xrange(1,21):
-		all_scus[peer_id] = {}
-
-	for peer_id in xrange(1,21):
-		temp_scus = get_best_scus(int(n), peer_id)
-		for k,v in temp_scus.iteritems():
-			all_scus[peer_id][int(k)] = v
-	for k,v in all_scus.iteritems():
-		for ky, val in v.iteritems():
-			for e in val:
-				if len(e)>0:
-					e.append(-1*ky)
-			print k, ky, val

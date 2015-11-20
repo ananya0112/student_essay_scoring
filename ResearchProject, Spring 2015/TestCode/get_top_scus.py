@@ -46,10 +46,14 @@ def extract_top_n_scus(file_pth, n):
 	return top_scu_list
 
 
-def get_best_scus(n, peer_id):
-	""" Set no_sen (global parameter) on top """
-	best_scu_path = 'Sentences/Unique_Sets_new/12_10_09_MATTER.pyr/'+str(peer_id)+'/new_wtd_files/'
-	top_scu_dict = dict() # <sen_id : {[], []} set of scu's>
+def get_best_scus(n, peer_id, best_scu_path=""):
+	""" Set no_sen (global parameter) on top |
+	best_scu_path is the path to the candidate-scu's generated. This is processed as an input to the 
+	'pyr, peer' : scu - > sen allocation function """
+
+	if best_scu_path == "":
+		best_scu_path = 'Sentences/Unique_Sets_new/12_10_09_MATTER.pyr/'+str(peer_id)+'/new_wtd_files/'
+	top_scu_dict = dict() # <sen_id : {[], []} set of scu's> | * is for each sentence-id in the folder #
 	for file_path in glob.glob(os.path.join(best_scu_path, '*.best.scu.wtd.new.st.unique')):
 		sen_no = file_path[len(best_scu_path):file_path.find('.best.scu.wtd.new')]
 		sen_id = get_valid_senid(sen_no)
@@ -118,7 +122,7 @@ best_scu's :
 9 [['100'], ['136', '100']]
 
 
-new X : set([100, 103, 136, 105, 138, 119, 110, -7, -1, 137, -8, 121, -4, -3, -2, -9])
+new X : set([100, 103, 13 6, 105, 138, 119, 110, -7, -1, 137, -8, 121, -4, -3, -2, -9])
 """
 
 

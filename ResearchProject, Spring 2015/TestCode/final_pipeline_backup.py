@@ -9,7 +9,7 @@
 # -*- coding: iso-8859-1 -*-
 import os
 import config
-from process_gwmin_results import compute_gwmin_scores, get_analytics
+from process_gwmin_results import compute_gwmin_scores
 
 
 """
@@ -66,15 +66,15 @@ doc_id | peerid | senid | sentence_length | sentence_text
 This is used as an input to generate unique sets for each sentence using genSegments.py indirectly, where only that peer's sentences are extracted 
 & then given as input
 
-Note: sentence_file.st contains sentences from 'ALL PYRAMIDS + ALL PEERS'. Hence 'sentence_file_peerid.py' is essential to prune the sentence set.
+Note: sentence_file.st contains sentences from 'ALL PYRAMIDS + ALL PEERS'. Hence 'sentence_file_peerid.py' is essetial to prune the sentence set.
 """
 # # Eg: python senfilegeneration.py text.tok summary.st 1 sentence_file.st
 sen_file = os.path.join(config.peer_path, "sentence_file.1022644.st")
-print "calling sentence file generation.. "
-cmd1 = 'python senfilegeneration.py "'+ config.orig_text_tok +'" "' + config.orig_summary_st +'" 1 "'+ sen_file +'"'
+# print "calling sentence file generation.. "
+# cmd1 = 'python senfilegeneration.py "'+ config.orig_text_tok +'" "' + config.orig_summary_st +'" 1 "'+ sen_file +'"'
 # # print cmd1
 # os.system(cmd1)
-print "Done!"
+# print "Done!"
 
 """
 * START FROM HERE FOR LOOPING OVER PEERS * 
@@ -89,7 +89,7 @@ Now important thing to rembr is : this returns all the sentences for a given 'py
 # peer_id = 2
 """ ***** """
 
-for peer_id in xrange(8, 9):
+for peer_id in xrange(1, 21):
 	peer_file = os.path.join(config.peer_path, "peer_file"+str(peer_id)+"_new.st")
 	import sentence_file_peerid as peer_sen
 
@@ -135,7 +135,7 @@ for peer_id in xrange(8, 9):
 	print 'sf', scu_file
 	print 'scoring segments for peer for each sentence'
 	cmd6 = "python score_scu_segment_stats.py '"+pyr_id+"' "+str(peer_id)+" '"+scu_file+"' "+str(ng_parameter) + " '"+output_score_file+"'"
-	# print cmd6
+	print cmd6
 	# os.system(cmd6)
 
 
@@ -161,10 +161,11 @@ for peer_id in xrange(8, 9):
 	Passes that as input to gwmin and obtains output
 
 	"""
-	
+
 	n = 3 ## SET ##
-	our_results, peer_scus = compute_gwmin_scores(pyr_id, scu_file, peer_id, n, out_segments_file, output_filtered_score_path)
-	recall, precision, fm = get_analytics(peer_id, our_results)
+	our_results, peer_scus = process_gwmin_results.compute_gwmin_scores(peer_id, n, output_filtered_score_path)
+
+
 
 	"""
 	Yg's pipeline file:
@@ -172,7 +173,6 @@ for peer_id in xrange(8, 9):
 
 	diff '/export/home/yh2639/pyramid/perl/pipeline_peer_new_ap.pl' 'pipeline_peer_new_ap.pl'
 
+	new peer folder : /export/home/ap3317/pyramid/test_output/peer
+
 	"""
-
-
-

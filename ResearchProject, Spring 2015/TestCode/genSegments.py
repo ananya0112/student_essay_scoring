@@ -98,7 +98,7 @@ if __name__ == "__main__":
 
 """
 "Sentences/Unique_Sets_new/12_10_09_MATTER.pyr/1"
-Eg call : python genSegments.py '[..some_path]/peer_file.st' 2 11 'Sentences/Unique_Sets_new/12_10_09_MATTER.pyr/1'[<-output_path:]
+Eg call : python genSegments.py 'peer_file2_new.st' 2 11 'Sentences/Unique_Sets_new/12_10_09_MATTER.pyr/2'[<-output_path:]
 """
 
 """

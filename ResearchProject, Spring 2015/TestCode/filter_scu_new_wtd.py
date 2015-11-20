@@ -7,7 +7,6 @@ Format of filtered document
 
 import re, os, glob, sys
 
-
 def get_list(str_scu):
 	""" Given a comma separated "105', '101'"; return [105, 101] i.e list of integer scu_id's """
 	scu_list = str_scu.split(',')
@@ -18,7 +17,7 @@ def get_list(str_scu):
 
 
 def get_valid_senid(senid):
-	"""For a string extracted from the os.path such as '/123./ will output '123' """
+	"""For a string extracted from the os.path such as '/123./' will output '123' """
 	ldigits = [e for e in senid if e.isdigit()]
 	return ''.join(ldigits)
 

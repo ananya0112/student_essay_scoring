@@ -8,39 +8,15 @@ Graph = {
 'E' : [1, 4, 5]
 }
 """
-import sys, os
-import config
+import sys
+
+# scu_dict = {1:5, 2:5, 3:4, 4:4, 5:3} # Dummy scu_dict #
 from data_analytics import getSCU
-scu_dict = {}
+scu_dict = getSCU("12_10_09_MATTER.pyr", "/Users/ananyapoddar/Desktop/ResearchProject, Spring 2015/TestCode/scu_YINGHUI/scu")
 
-# scu_dict = {1:5, 2:5, 3:4, 4:4, 5:3} # Dummy scu_dict for toy value#
-
-
-## default values ##
-# scu_file_path = os.path.join(config.scu_path, "scu")
-# pyr_id = "12_10_09_MATTER.pyr"
-
-global scu_file_path
-global pyr_id
-## -- ##
-
-
-def init_scudict():
-	global scu_dict
-	global scu_file_path
-	global pyr_id
-	if scu_file_path == "":
-		print 'setting default scu path in gwmin.py'
-		scu_file_path = os.path.join(config.scu_path, "scu")
-	if pyr_id == "":
-		print 'setting default pyramid name in gwmin.py'
-		pyr_id = "12_10_09_MATTER.pyr"
-	# scu_dict = getSCU("12_10_09_MATTER.pyr", "/Users/ananyapoddar/Desktop/ResearchProject, Spring 2015/TestCode/scu_YINGHUI/scu")
-	scu_dict = getSCU(pyr_id, scu_file_path)
-
-	# Adding max. values to scu-dictionary for sentence id's
-	for i in xrange(-50, 0):
-		scu_dict[i] = 5
+# Adding max. values to scu-dictionary for sentence id's
+for i in xrange(-18, 0):
+	scu_dict[i] = 5
 
 
 
@@ -99,16 +75,16 @@ class Graph(object):
 
 	def __generate_initial_graph(self, scu_sets):
 		""" Used to generate graph in the Initial state using input scu_sets  """
-		# print "----- Generating vertices -------" # First create list of vertices and their elements:
+		print "----- Generating vertices -------" # First create list of vertices and their elements:
 		for name, elements in scu_sets.iteritems():
 			v = Vertex(name, elements)
 			self.vertices.append(v)
-			# v.get_info()
+			v.get_info()
 
 		# print "----- Generating edges -------" # Then, create list of edges:
 		self.edges = [Edge(self.vertices[i], self.vertices[j]) for i in xrange(len(scu_sets)) for j in xrange(i+1, len(scu_sets)) if self.__is_edge(self.vertices[i], self.vertices[j])]
-		# for e in self.edges:
-		# 	print e.get_info()
+		for e in self.edges:
+			print e.get_info()
 
 		# Finished generating V,E | Components of Graph | Now generate graph by creating an adjacency list representation
 		self.__generate_adjacency_list()
@@ -150,9 +126,6 @@ class Graph(object):
 			# Since undirected;
 			self.__add_to_adjlist(edge.v1, edge.v2)
 			self.__add_to_adjlist(edge.v2, edge.v1)
-		isolated_vertices = [vertex for vertex in self.vertices if vertex not in self.adj_list]
-		for isolated_vertex in isolated_vertices:
-			self.adj_list[isolated_vertex] = []
 
 
 	def __get_edges_by_vertex(self, vertex):
@@ -186,7 +159,7 @@ class Graph(object):
 		self.vertices.remove(vertex)
 		# print '-----REMOVED NEIGHBORS! Regenerate adj list : -----'
 		self.__generate_adjacency_list()
-		# self.get_info()
+		self.get_info()
 		# print '----------'
 
 	
@@ -197,9 +170,10 @@ class Graph(object):
 
 	def __gwmin(self, vertex):
 		""" PLUGIN : Greedy algo (2) cost function/weight specified in GWMIN paper """
-		n_weight = 0
+		# print 'v--->'
+		# vertex.get_info()
 		n_weight = sum([neighbor.weight for neighbor in self.adj_list[vertex]]) # sum of weights of each vertex in neighborhood
-		return float(vertex.weight)/float(n_weight) if n_weight > 0 else float(vertex.weight)
+		return float(vertex.weight)/float(n_weight)
 
 
 	def __get_gwm_wt(self, vertex):
@@ -213,20 +187,19 @@ class Graph(object):
 
 
 	def __get_optimal_vertex(self):
-		""" For graph, returns vertex s.t max v [W(vertex)/W(neighborhood)]
-			gwm_wt = self.__gwdegree(vertex) # (1)
-			gwm_wt = self.__gwmin(vertex) # (2)
-		"""
+		""" For graph, returns vertex s.t max v [W(vertex)/W(neighborhood)]"""
 		opt_vertex = None
 		max_gwm = -1
 		for vertex in self.vertices:
-			# print '- vertex : '+str(vertex.name)+" | Wt : "
+			print '- vertex : '+str(vertex.name)+" | Wt : "
+			# gwm_wt = self.__gwdegree(vertex) # (1)
+			# gwm_wt = self.__gwmin(vertex) # (2)
 			gwm_wt = self.__get_gwm_wt(vertex)
-			# print gwm_wt
+			print gwm_wt
 			if gwm_wt > max_gwm:
 				max_gwm = gwm_wt
 				opt_vertex = vertex
-		# print "---OPT ----", opt_vertex.name
+		print "---OPT ----", opt_vertex.name
 		return opt_vertex
 
 
@@ -255,94 +228,6 @@ class Graph(object):
 			print '\n'
 
 
-
-def main(a_type, gr = {}):
-	global algo_type
-	init_scudict()
-	algo_type = int(a_type) # Setting the algorithm type!
-	# SCU_SETS toy value #
-	# gr = s
-	g = Graph(gr)
-	# g.get_info() # Here, returning graph in the initial state # 
-	max_set = g.get_maximal_independent_set()
-	print 'MAXIMAL SET : (Set names and elements) :-'
-	for e in max_set:
-		print str(e.name) + ":", e.scu_ids
-		print ","
-	return max_set
-
-
-def get_results(a_type, gr, scu_f, pyr):
-	global scu_file_path
-	global pyr_id
-	scu_file_path = scu_f
-	pyr_id = pyr
-	r = {}
-	results = main(a_type, gr)
-	for e in results:
-		r[e.name] = [int(scu) for scu in e.scu_ids]
-	return r
-
-
-def usage():
-    sys.stderr.write("""
-    Usage: Generate Maximal Independent set.
-    Execute this file by writing 'python gwmin.py <int algorithm type value>' 
-    where int value = 1 => Algo 1 OR value = 2 => Algo 2 | Algo 2 performs better! 
-    [Optional], pass the pyramid name followed by scu-file-path\n""")
-
-
-
-if __name__ == "__main__":
-	global pyr_id
-	global scu_file_path
-	if (((len(sys.argv) == 2 or len(sys.argv) == 4)) and (sys.argv[1].isdigit())):
-		if (len(sys.argv) == 4):
-			pyr_id = sys.argv[2]
-			scu_file_path = sys.argv[3]
-		main(sys.argv[1])
-	
-	else:
-		usage()
-		sys.exit(1)	
-
-"""
-Example call:
-python gwmin.py 2 '12_10_09_MATTER.pyr' '../ServerFiles/scu/scu'
-"""	
-
-
-"""
-Debugging statements:
-# print "----- OLD EDGES -------" 
-# for e in self.edges:
-# 	print e.get_info()
-# 	print self.adj_list[vertex]
-# print "----- OLD EDGES end -------" 
-
-# print "----- NEW EDGES after removing neighbor's edges of vertex -------" 
-# for e in self.edges:
-# 	print e.get_info()
-# print "----- NEW VERTICES -------" 
-# for v in self.vertices:
-# 	print v.name
-
-# def __gwdegree(self, vertex):
-# print "vertex weight : ", float(vertex.weight)
-# print "den : ", float(len(self.adj_list[vertex]) + 1)
-
-
-# Toy value:
-# s = {
-# 'A' : [1, 5],
-# 'B' : [2, 4],
-# 'C' : [2, 3],
-# 'D' : [3],
-# 'E' : [1, 4, 5]
-# }
-"""
-
-"""
 # s = {1 : [103, -1],
 # 2 :[100, -1],
 # 3 :[105, -2],
@@ -363,66 +248,120 @@ Debugging statements:
 # 18 :[136, 100, -9]
 # }
 
-# s = {
-# 1: [105, -1]
-# ,
-# 2: [103, -1]
-# ,
-# 3: [110, -2]
-# ,
-# 4: [134, -2]
-# ,
-# 5: [134, 110, -2]
-# ,
-# 6: [105, -3]
-# ,
-# 7: [106, -3]
-# ,
-# 8: [103, 105, -3]
-# ,
-# 9: [138, -4]
-# ,
-# 10: [137, -4]
-# ,
-# 11: [159, 137, -5]
-# ,
-# 12: [159, -5]
-# ,
-# 13: [137, -5]
-# ,
-# 14: [100, -6]
-# ,
-# 15: [136, -7]
-# ,
-# 16: [100, -8]
-# ,
-# 17: [103, 100, -8]
-# ,
-# 18: [119, -8]
-# ,
-# 19: [100, -9]
-# ,
-# 20: [109, 120, -10]
-# ,
-# 21: [120, 103, -10]
-# ,
-# 22: [109, 103, -10]
-# ,
-# 23: [115, -11]
-# ,
-# 24: [103, -11]
-# ,
-# 25: [115, 103, -11]
-# ,
-# 26: [113, -12]
-# ,
-# 27: [103, -12]
-# ,
-# 28: [116, -13]
-# ,
-# 29: [107, 116, -13]
-# ,
-# 30: [107, 122, -13]
-# }
+s = {1: [105, -1]
+,
+2: [103, -1]
+,
+3: [110, -2]
+,
+4: [134, -2]
+,
+5: [134, 110, -2]
+,
+6: [105, -3]
+,
+7: [106, -3]
+,
+8: [103, 105, -3]
+,
+9: [138, -4]
+,
+10: [137, -4]
+,
+11: [159, 137, -5]
+,
+12: [159, -5]
+,
+13: [137, -5]
+,
+14: [100, -6]
+,
+15: [136, -7]
+,
+16: [100, -8]
+,
+17: [103, 100, -8]
+,
+18: [119, -8]
+,
+19: [100, -9]
+,
+20: [109, 120, -10]
+,
+21: [120, 103, -10]
+,
+22: [109, 103, -10]
+,
+23: [115, -11]
+,
+24: [103, -11]
+,
+25: [115, 103, -11]
+,
+26: [113, -12]
+,
+27: [103, -12]
+,
+28: [116, -13]
+,
+29: [107, 116, -13]
+,
+30: [107, 122, -13]
+}
 
+
+def main(a_type, gr = {}):
+	global algo_type
+	algo_type = int(a_type) # Setting the algorithm type!
+	# SCU_SETS toy value #
+	# s = {
+	# 'A' : [1, 5],
+	# 'B' : [2, 4],
+	# 'C' : [2, 3],
+	# 'D' : [3],
+	# 'E' : [1, 4, 5]
+	# }
+	gr = s
+	g = Graph(s)
+	g.get_info() # Here, returning graph in the initial state # 
+	max_set = g.get_maximal_independent_set()
+	print 'MAXIMAL SET : (Set names and elements) :-'
+	for e in max_set:
+		print e.name, e.scu_ids
+
+
+
+def usage():
+    sys.stderr.write("""
+    Usage: Generate Maximal Independent set.
+    Execute this file by writing 'python gwmin.py <int algorithm type value>' 
+    where int value = 1 => Algo 1 OR value = 2 => Algo 2 | Algo 2 performs better! \n""")
+
+
+
+if __name__ == "__main__": 
+	if ((len(sys.argv) != 2) or (not sys.argv[1].isdigit())):
+		usage()
+		sys.exit(1)	
+	main(sys.argv[1])
+
+
+"""
+Debugging statements:
+# print "----- OLD EDGES -------" 
+# for e in self.edges:
+# 	print e.get_info()
+# 	print self.adj_list[vertex]
+# print "----- OLD EDGES end -------" 
+
+# print "----- NEW EDGES after removing neighbor's edges of vertex -------" 
+# for e in self.edges:
+# 	print e.get_info()
+# print "----- NEW VERTICES -------" 
+# for v in self.vertices:
+# 	print v.name
+
+# def __gwdegree(self, vertex):
+# print "vertex weight : ", float(vertex.weight)
+# print "den : ", float(len(self.adj_list[vertex]) + 1)
 """
